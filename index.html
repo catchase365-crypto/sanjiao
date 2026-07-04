@@ -219,15 +219,15 @@
                 this.materials = {
                     base: new THREE.MeshStandardMaterial({ 
                         color: 0x0a101d, roughness: 0.04, metalness: 0.1, 
-                        transparent: true, opacity: 0.85, envMap: envTexture, envMapIntensity: 3.5,
+                        transparent: true, opacity: 0.55, envMap: envTexture, envMapIntensity: 3.5,
                         side: THREE.DoubleSide, depthWrite: false,
                         polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1
                     }),
-                    red: new THREE.MeshStandardMaterial({ map: texRed, bumpMap: texRed, bumpScale: 0.01, roughness: 0.25, metalness: 0.1, emissive: 0x000000, envMap: envTexture, envMapIntensity: 0.4 }),
-                    yellow: new THREE.MeshStandardMaterial({ map: texYellow, bumpMap: texYellow, bumpScale: 0.01, roughness: 0.25, metalness: 0.1, emissive: 0x000000, envMap: envTexture, envMapIntensity: 0.4 }),
-                    blue: new THREE.MeshStandardMaterial({ map: texBlue, bumpMap: texBlue, bumpScale: 0.01, roughness: 0.25, metalness: 0.1, emissive: 0x000000, envMap: envTexture, envMapIntensity: 0.4 }),
-                    green: new THREE.MeshStandardMaterial({ map: texGreen, bumpMap: texGreen, bumpScale: 0.01, roughness: 0.25, metalness: 0.1, emissive: 0x000000, envMap: envTexture, envMapIntensity: 0.4 }),
-                    white: new THREE.MeshStandardMaterial({ map: texWhite, bumpMap: texWhite, bumpScale: 0.01, roughness: 0.2, metalness: 0.1, emissive: 0x000000, envMap: envTexture, envMapIntensity: 0.4 })
+                    red: new THREE.MeshStandardMaterial({ map: texRed, bumpMap: texRed, bumpScale: 0.01, roughness: 0.15, metalness: 0.3, emissive: 0x2b0000, envMap: envTexture, envMapIntensity: 1.2 }),
+                    yellow: new THREE.MeshStandardMaterial({ map: texYellow, bumpMap: texYellow, bumpScale: 0.01, roughness: 0.15, metalness: 0.3, emissive: 0x2b2300, envMap: envTexture, envMapIntensity: 1.2 }),
+                    blue: new THREE.MeshStandardMaterial({ map: texBlue, bumpMap: texBlue, bumpScale: 0.01, roughness: 0.15, metalness: 0.3, emissive: 0x000c2b, envMap: envTexture, envMapIntensity: 1.2 }),
+                    green: new THREE.MeshStandardMaterial({ map: texGreen, bumpMap: texGreen, bumpScale: 0.01, roughness: 0.15, metalness: 0.3, emissive: 0x002b14, envMap: envTexture, envMapIntensity: 1.2 }),
+                    white: new THREE.MeshStandardMaterial({ map: texWhite, bumpMap: texWhite, bumpScale: 0.01, roughness: 0.1, metalness: 0.4, emissive: 0x1c1c1c, envMap: envTexture, envMapIntensity: 1.5 })
                 };
 
                 window.addEventListener('resize', () => {
