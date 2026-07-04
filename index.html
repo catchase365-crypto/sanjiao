@@ -200,7 +200,16 @@
                 dirLight2.position.set(-5, -5, -5);
                 this.scene.add(dirLight2);
 
-                const texInner = TextureFactory.createWood(0x050a05, true);
+                // 创建动态流光渐变环境贴图(Fake EnvMap)以增强玻璃反射质感
+                const envCanvas = document.createElement('canvas');
+                envCanvas.width = 256; envCanvas.height = 256;
+                const envCtx = envCanvas.getContext('2d');
+                const envGrad = envCtx.createLinearGradient(0, 0, 256, 256);
+                envGrad.addColorStop(0, '#0d1b2a'); envGrad.addColorStop(0.5, '#415a77'); envGrad.addColorStop(1, '#e0e1dd');
+                envCtx.fillStyle = envGrad; envCtx.fillRect(0, 0, 256, 256);
+                const envTexture = new THREE.CanvasTexture(envCanvas);
+                envTexture.mapping = THREE.EquirectangularReflectionMapping;
+
                 const texRed = TextureFactory.createWood(0xb90000);
                 const texYellow = TextureFactory.createWood(0xffd700);
                 const texBlue = TextureFactory.createWood(0x0045ad);
@@ -209,14 +218,16 @@
 
                 this.materials = {
                     base: new THREE.MeshStandardMaterial({ 
-                        map: texInner, roughness: 0.1, metalness: 0.9, color: 0x111111,
+                        color: 0x0a101d, roughness: 0.04, metalness: 0.1, 
+                        transparent: true, opacity: 0.85, envMap: envTexture, envMapIntensity: 3.5,
+                        side: THREE.DoubleSide, depthWrite: false,
                         polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1
                     }),
-                    red: new THREE.MeshStandardMaterial({ map: texRed, bumpMap: texRed, bumpScale: 0.01, roughness: 0.2, metalness: 0.2 }),
-                    yellow: new THREE.MeshStandardMaterial({ map: texYellow, bumpMap: texYellow, bumpScale: 0.01, roughness: 0.2, metalness: 0.2 }),
-                    blue: new THREE.MeshStandardMaterial({ map: texBlue, bumpMap: texBlue, bumpScale: 0.01, roughness: 0.2, metalness: 0.2 }),
-                    green: new THREE.MeshStandardMaterial({ map: texGreen, bumpMap: texGreen, bumpScale: 0.01, roughness: 0.2, metalness: 0.2 }),
-                    white: new THREE.MeshStandardMaterial({ map: texWhite, bumpMap: texWhite, bumpScale: 0.01, roughness: 0.2, metalness: 0.2 })
+                    red: new THREE.MeshStandardMaterial({ map: texRed, bumpMap: texRed, bumpScale: 0.01, roughness: 0.25, metalness: 0.1, emissive: 0x000000, envMap: envTexture, envMapIntensity: 0.4 }),
+                    yellow: new THREE.MeshStandardMaterial({ map: texYellow, bumpMap: texYellow, bumpScale: 0.01, roughness: 0.25, metalness: 0.1, emissive: 0x000000, envMap: envTexture, envMapIntensity: 0.4 }),
+                    blue: new THREE.MeshStandardMaterial({ map: texBlue, bumpMap: texBlue, bumpScale: 0.01, roughness: 0.25, metalness: 0.1, emissive: 0x000000, envMap: envTexture, envMapIntensity: 0.4 }),
+                    green: new THREE.MeshStandardMaterial({ map: texGreen, bumpMap: texGreen, bumpScale: 0.01, roughness: 0.25, metalness: 0.1, emissive: 0x000000, envMap: envTexture, envMapIntensity: 0.4 }),
+                    white: new THREE.MeshStandardMaterial({ map: texWhite, bumpMap: texWhite, bumpScale: 0.01, roughness: 0.2, metalness: 0.1, emissive: 0x000000, envMap: envTexture, envMapIntensity: 0.4 })
                 };
 
                 window.addEventListener('resize', () => {
@@ -541,32 +552,36 @@
                 document.getElementById('victory-overlay').classList.remove('show');
 
                 let count = 0;
-                const totalSteps = 30;
+                const totalSteps = 25;
                 let lastEmpty = -1;
 
-                const interval = setInterval(() => {
+                const doStep = () => {
                     let emptyIdx = this.state.indexOf(4);
                     let neighbors = this.adj[emptyIdx].filter(n => n !== lastEmpty);
                     if (neighbors.length === 0) neighbors = this.adj[emptyIdx];
 
                     let randomNext = neighbors[Math.floor(Math.random() * neighbors.length)];
                     
-                    // 模拟快速随机抽动按钮的压入回弹脉冲
                     let targetBtn = this.buttons[randomNext];
-                    targetBtn.userData.animProgress = 1.0; 
+                    targetBtn.userData.isPressed = true;
+                    targetBtn.userData.animProgress = 0.0;
+                    
+                    targetBtn.userData.onPressPeak = () => {
+                        this.state[emptyIdx] = this.state[randomNext];
+                        this.state[randomNext] = 4;
+                        this.updateVisuals();
+                        
+                        lastEmpty = emptyIdx;
+                        count++;
 
-                    this.state[emptyIdx] = this.state[randomNext];
-                    this.state[randomNext] = 4;
-                    this.updateVisuals();
-
-                    lastEmpty = emptyIdx;
-                    count++;
-
-                    if (count >= totalSteps) {
-                        clearInterval(interval);
-                        this.isShuffling = false;
-                    }
-                }, 60); 
+                        if (count < totalSteps) {
+                            setTimeout(doStep, 45); 
+                        } else {
+                            this.isShuffling = false;
+                        }
+                    };
+                };
+                doStep();
             }
 
             reset() {
